@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <title>Type Ahead 👀</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="icon" href="https://fav.farm/🔥" />
+</head>
+
+<body>
+  <form class="search-form">
+    <input type="text" class="search" placeholder="City or State" />
+    <ul class="suggestions">
+      <li>Filter for a city</li>
+      <li>or a state</li>
+    </ul>
+  </form>
+  <script>
+    const endpoint =
+      "https://gist.githubusercontent.com/Miserlou/c5cd8364bf9b2420bb29/raw/2bf258763cdddd704f8ffd3ea9a3e81d25e2c6f6/cities.json";
+
+    const searchBar = document.querySelector(".search");
+    const suggestion = document.querySelector(".suggestions");
+    const cities = [];
+    searchBar.addEventListener("change", displayMatches);
+    searchBar.addEventListener("keyup", displayMatches);
+    fetch(endpoint)
+      .then((res) => res.json())
+      .then((data) => cities.push(...data));
+    console.log(cities);
+
+    function findMatches(word, citiesToSearch) {
+      return citiesToSearch.filter((item) => {
+        const regex = new RegExp(word, "gi");
+        return item.city.match(regex) || item.state.match(regex);
+      });
+    }
+
+    function addCommasToNumber(number) {
+      const numStr = number.toString();
+
+      return numStr.toLocaleString();
+    }
+
+    function addCommasToNumber(number) {
+      return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    }
+    function displayMatches() {
+      const matchArray = findMatches(this.value, cities);
+      const htmlCities = matchArray
+        .map((city) => {
+          const regex = new RegExp(this.value, "gi");
+          const cityName = city.city.replace(
+            regex,
+            `<span class ='hl'>${this.value}</span>`
+          );
+          const stateName = city.state.replace(
+            regex,
+            `<span class ='hl'>${this.value}</span>`
+          );
+          return `<li> 
+    <span class ="name"> ${cityName}, ${stateName}</span>
+    <span class ="population"> ${addCommasToNumber(city.population)}</span>
+    </li>`;
+        })
+        .join("");
+      suggestion.innerHTML = htmlCities;
+    }
+  </script>
+</body>
+
+</html>
